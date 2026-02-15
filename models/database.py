@@ -12,7 +12,9 @@ def get_db():
     return db
 
 def close_connection(exception):
-    db = getattar(g, '_database', None)
+
+    db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+        
         
