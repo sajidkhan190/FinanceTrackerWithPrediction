@@ -1,8 +1,10 @@
 from flask import Flask
 from models.database import close_connection
 from models.database import init_db 
+from routes.auth import auth 
 
 app = Flask(__name__)
+app.register_blueprint(auth)
 app.secret_key = 's4l143@@'
 
 init_db()
@@ -15,3 +17,7 @@ def shutdown_session(exception=None):
 if __name__ == "__main__":
     app.run(debug=True)
     
+@app.route('/dashboard')
+def dashboard():
+    return "Welcome to the dashboard!"
+
