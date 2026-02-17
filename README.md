@@ -11,25 +11,26 @@ A python-based web application that helps users manage income and expenses, visu
     * Visulaization: Matplotlib / Plotly
     * Frontend: HTML, CSS, JavaScript, Bootstrap
     * Version Control: Git & GitHub
+    
 # Project Structure
-FinanceTrackerWithPrediction/
-│
-├── app.py
-├── config.py
-├── finance.db
-├── requirements.txt
-│
-├── models/
-├── routes/
-├── templates/
-├── static/
-└── utils/
+FinanceTrackerWithPrediction/<br>
+│<br>
+├── app.py <br>
+├── config.py <br>
+├── finance.db <br>
+├── requirements.txt <br>
+│ <br>
+├── models/ <br>
+├── routes/ <br>
+├── templates/ <br>
+├── static/ <br>
+└── utils/ <br>
 
 # Current Progress
 
-✅ Project Structure Created
-✅ SQLite Database Connected
-⬜ User Authentication Module (In Progress)
-⬜ Income/Expense Management
-⬜ Reports & Visualization
+✅ Project Structure Created <br>
+✅ SQLite Database Connected <br>
+✅ User Authentication Module <br>
+⬜ Income/Expense Management  (In Progress) <br>
+⬜ Reports & Visualization <br>
 ⬜ Expense Prediction Module
