@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from models.database import get_db
-
+from flask import session, redirect, url_for
 auth = Blueprint('auth', __name__)
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -46,9 +46,29 @@ def login():
         ).fetchone()
 
         if user and check_password_hash(user['password'], password):
-            flash('login successful!')
-            return redirect(url_for('dashboard'))
+            session['user_id'] = user['id']
+            session['user_name'] = user['name']                
+            flash('Login successful!', 'success')
+            return redirect(url_for('auth.dashboard'))
         else:
-            flash('Invalid email or password.')
+            flash('Invalid email or password.', 'error')
 
     return render_template('login.html')
+
+@auth.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+    
+    return f"""
+    <h2> Welcome {session['user_name']}</h2>
+    <a href='/add'> Add Transaction </a><br>
+    <a href='/logout'> Logout </a>
+    """
+
+    
+@auth.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('auth.login'))

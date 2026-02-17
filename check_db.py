@@ -10,4 +10,10 @@ print("Tables in database:")
 for table in tables:
     print(table[0])
 
+cursor.execute("SELECT * FROM transactions")
+rows = cursor.fetchall()
+
+for row in rows:
+    print(row)
+
 conn.close()
