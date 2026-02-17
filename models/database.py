@@ -2,7 +2,7 @@ import sqlite3
 from flask import g
 import os
 
-DATABASE = os.path.join(os.getcwd(), 'finance_db.db')
+DATABASE = os.path.join(os.getcwd(), 'finance.db')
                         
 def get_db():
     db = getattar(g, '_database', None)
@@ -17,4 +17,19 @@ def close_connection(exception):
     if db is not None:
         db.close()
         
-        
+def init_db():
+    conn = sqlite3.connect("finance.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   name TEXT NOT NULL,
+                   email TEXT NOT NULL UNIQUE,
+                   password TEXT NOT NULL,
+                   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+                   """)
+
+    conn.commit()
+    conn.close()
