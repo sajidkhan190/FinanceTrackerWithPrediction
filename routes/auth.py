@@ -61,3 +61,15 @@ def logout():
     session.clear()
     flash('You have been logged out.', 'success')
     return redirect(url_for('auth.login'))
+
+
+@auth.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        # Now only sample message
+        flash("Password recovery feature coming soon!", "info")
+        return redirect(url_for('auth.login'))
+    
+    return render_template('forgot_password.html')
+    
