@@ -1,48 +1,163 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Dashboard</title>
-         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    </head>
-    <body class="container mt-5">
-    
-    <h2>Welcome, {{ name }}!</h2>
+{% extends "base.html" %}
+{% block title %}Dashboard | Finance Tracker{% endblock %}
 
-<div class="row mt-4">
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Welcome, {{ name }}!</h2>
 
+<!-- Summary Card -->
+<div class="row mb-4">
     <div class="col-md-4">
-        <div class="card text-white bg-success mb-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body text-center">
+                <h5><i class="bi bi-arrow-down-circle"></i> Total Expenses</h5>
+                <h2>Rs. {{ "%.2f"|format(expense) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5><i class="bi bi-tags"></i> Categories Tracked</h5>
+                <h2>{{ categories|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5><i class="bi bi-calendar3"></i> Months Tracked</h5>
+                <h2>{{ months|length }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="mb-4">
+    <a href="/add" class="btn btn-dark"><i class="bi bi-plus-circle"></i> Add Expense</a>
+    <a href="/expenses" class="btn btn-outline-dark"><i class="bi bi-list-ul"></i> View All Expenses</a>
+</div>
+
+<!-- Charts Section -->
+{% if categories|length > 0 %}
+<div class="row mb-4">
+    <!-- Pie Chart: Category-wise Distribution -->
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
             <div class="card-body">
-                <h5>Total Income</h5>
-                <h3>{{ income }}</h3>
+                <h5 class="card-title"><i class="bi bi-pie-chart"></i> Category-wise Expense Distribution</h5>
+                <canvas id="categoryChart"></canvas>
             </div>
         </div>
     </div>
 
-
-    <div class="col-md-4">
-        <div class="card text-white bg-danger mb-3">
+    <!-- Bar Chart: Monthly Summary -->
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
             <div class="card-body">
-                <h5>Total Expenses</h5>
-                <h3>{{ expense }}</h3>
+                <h5 class="card-title"><i class="bi bi-bar-chart"></i> Monthly Expense Summary</h5>
+                <canvas id="monthlyChart"></canvas>
             </div>
         </div>
     </div>
+</div>
+{% endif %}
 
-    <div class="col-md-4">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-body">
-                <h5>Net Balance</h5>
-                <h3>{{ balance }}</h3>
-            </div>
+<!-- Recent Expenses Table -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-clock-history"></i> Recent Expenses</h5>
+        {% if recent_expenses %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount (Rs.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exp in recent_expenses %}
+                    <tr>
+                        <td>{{ exp['date'] }}</td>
+                        <td><span class="badge bg-secondary">{{ exp['category'] }}</span></td>
+                        <td>{{ exp['description'] if exp['description'] else '-' }}</td>
+                        <td class="text-end fw-bold text-danger">{{ "%.2f"|format(exp['amount']) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+        {% else %}
+        <p class="text-muted mb-0">No expenses yet. Click "Add Expense" to get started!</p>
+        {% endif %}
     </div>
+</div>
+{% endblock %}
 
-</div>  
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Color palette for charts
+    const colors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+        '#9966FF', '#FF9F40', '#C9CBCF', '#7BC225'
+    ];
 
-<a href="/add" class="btn btn-dark">Add Transaction</a>
-<a href="/logout" class="btn btn-secondary">Logout</a>
+    // Category-wise Pie Chart
+    const categories = {{ categories|tojson }};
+    const categoryAmounts = {{ category_amounts|tojson }};
 
+    if (categories.length > 0) {
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: categories,
+                datasets: [{
+                    data: categoryAmounts,
+                    backgroundColor: colors.slice(0, categories.length),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    }
 
-    </body>
-</html>
+    // Monthly Bar Chart
+    const months = {{ months|tojson }};
+    const monthlyAmounts = {{ monthly_amounts|tojson }};
+
+    if (months.length > 0) {
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Expense (Rs.)',
+                    data: monthlyAmounts,
+                    backgroundColor: '#FF6384',
+                    borderColor: '#FF6384',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}
