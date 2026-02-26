@@ -1,99 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title> Login | Finance Tracker </title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    
-        <style> 
-            body {
-                background: linear-gradient(135deg, #4e73df, #1cc88a);
-                height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Finance Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
 
-            .login-card {
-                width: 100%;
-                max-width: 420px;
-                border-radius: 15px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            }       
-            
-            .logo {
-                width: 100px;
-                display: block;
-                margin: 0 auto 15px auto;
-            }
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            overflow: hidden;
+            position: relative;
+        }
 
-            .btn-primary {
-                background-color: #4e73df;
-                border: none;
-            }
+        /* Animated floating circles */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.07;
+            animation: float 8s ease-in-out infinite;
+        }
+        body::before {
+            width: 400px; height: 400px;
+            background: #667eea;
+            top: -100px; right: -100px;
+        }
+        body::after {
+            width: 300px; height: 300px;
+            background: #764ba2;
+            bottom: -80px; left: -80px;
+            animation-delay: 4s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(5deg); }
+        }
 
-            .btn-primary:hover {
-                background-color: #2e59d9;
-            }
+        .login-wrapper {
+            width: 100%;
+            max-width: 440px;
+            z-index: 1;
+        }
 
-            .form-control:focus {
-                box-shadow: none;
-                border-color: #4e73df;
-            }
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 40px 35px;
+            animation: slideUp 0.6s ease;
+        }
 
-            .forgot-link {
-                font-size: 14px;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-            }
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 10px auto;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
 
-            </style>
-    
-    </head>
+        .brand-title {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .brand-subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #555;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .input-group-custom {
+            position: relative;
+        }
+        .input-group-custom i.field-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            z-index: 2;
+            font-size: 16px;
+        }
+        .input-group-custom .form-control {
+            padding-left: 42px;
+            border-radius: 12px;
+            border: 2px solid #eee;
+            padding: 13px 45px 13px 42px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .input-group-custom .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            z-index: 3;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+        .toggle-password:hover {
+            color: #667eea;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 13px;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+        }
+
+        .forgot-link {
+            font-size: 13px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .forgot-link:hover { color: #764ba2; }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #888;
+        }
+        .register-link a {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .register-link a:hover { color: #764ba2; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #ccc;
+            font-size: 12px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #eee;
+        }
+        .divider span { padding: 0 15px; }
+    </style>
+</head>
 <body>
-    <div class="card login-card p-4">
-        <!-- Logo -->
-         <img src="{{url_for('static', filename='images/logo.png')}}" class="logo">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo" alt="Logo">
+            <div class="brand-title">Finance Tracker</div>
+            <div class="brand-subtitle">Track your expenses smartly 💰</div>
 
-         <h4 class="text-center mb-3">Login to Your Account</h4>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert 
+                        {% if category == 'error' %} alert-danger 
+                        {% elif category == 'success' %} alert-success 
+                        {% endif %} alert-dismissible fade show py-2" style="border-radius:10px; font-size:13px;">
+                        {{ message }}
+                        <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert 
-                    {% if category == 'error' %} alert-danger 
-                    {% elif category == 'success' %} alert-success 
-                    {% endif %}">
-                    {{ message }}
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-group-custom">
+                        <i class="bi bi-envelope field-icon"></i>
+                        <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
+                    </div>
                 </div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %} 
 
+                <div class="mb-2">
+                    <label class="form-label">Password</label>
+                    <div class="input-group-custom">
+                        <i class="bi bi-lock field-icon"></i>
+                        <input type="password" name="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                        <i class="bi bi-eye-slash toggle-password" id="toggleLoginPassword"></i>
+                    </div>
+                </div>
 
-        <form method="POST">
+                <div class="text-end mb-3">
+                    <a href="/forgot-password" class="forgot-link">Forgot Password?</a>
+                </div>
 
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email" name="email" class="form-control" required>
+                <button type="submit" class="btn btn-primary btn-login w-100">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                </button>
+            </form>
+
+            <div class="divider"><span>New here?</span></div>
+
+            <div class="register-link">
+                Don't have an account? <a href="/register">Create one now</a>
+            </div>
         </div>
-
-        <div class="mb-2">
-            <label>Password</label>
-            <input type="password" name="password" class="form-control" required>
-        </div>
-
-        <div class="text-end mb-3">
-            <a href="/forgot-password" class="forgot-link">Forgot Password?</a>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100">Login</button>
-
-    </form>
-
-    <p class="text-center mt-3 mb-0">Don't have an account? <a href="/register">Register here</a></p>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('toggleLoginPassword').addEventListener('click', function () {
+            const pwd = document.getElementById('loginPassword');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                this.classList.remove('bi-eye-slash');
+                this.classList.add('bi-eye');
+            } else {
+                pwd.type = 'password';
+                this.classList.remove('bi-eye');
+                this.classList.add('bi-eye-slash');
+            }
+        });
+    </script>
 </body>
 </html>

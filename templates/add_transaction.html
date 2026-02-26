@@ -1,47 +1,202 @@
 {% extends "base.html" %}
 {% block title %}Add Expense | Finance Tracker{% endblock %}
 
+{% block extra_css %}
+<style>
+    .expense-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .expense-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 25px 30px;
+        border: none;
+    }
+    .expense-card .card-header h3 {
+        color: white;
+        margin: 0;
+        font-weight: 700;
+    }
+    .expense-card .card-header p {
+        color: rgba(255,255,255,0.8);
+        margin: 5px 0 0 0;
+        font-size: 14px;
+    }
+    .expense-card .card-body {
+        padding: 30px;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #444;
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 2px solid #e8e8e8;
+        transition: all 0.3s ease;
+        font-size: 15px;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+    .input-icon {
+        position: relative;
+    }
+    .input-icon i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 16px;
+    }
+    .input-icon .form-control,
+    .input-icon .form-select {
+        padding-left: 42px;
+    }
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+    }
+    .category-grid {
+        display: none;
+    }
+    .amount-display {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        margin-top: 10px;
+        display: none;
+    }
+    .amount-display h4 {
+        color: #667eea;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card p-4">
-            <h3 class="mb-4"><i class="bi bi-plus-circle"></i> Add New Expense</h3>
+    <div class="col-lg-6 col-md-8">
+        <div class="card expense-card">
+            <div class="card-header">
+                <h3><i class="bi bi-wallet-fill me-2"></i>Add New Expense</h3>
+                <p><i class="bi bi-info-circle me-1"></i>Track where your money goes</p>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="type" value="expense">
 
-            <form method="POST">
-                <input type="hidden" name="type" value="expense">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="bi bi-calendar-event me-1"></i>Date</label>
+                            <div class="input-icon">
+                                <input type="date" name="date" class="form-control" required>
+                            </div>
+                        </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Date</label>
-                    <input type="date" name="date" class="form-control" required>
-                </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="bi bi-currency-exchange me-1"></i>Amount (Rs.)</label>
+                            <div class="input-icon">
+                                <i class="bi bi-cash"></i>
+                                <input type="number" step="0.01" min="1" name="amount" class="form-control" placeholder="e.g. 500" required>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Amount (Rs.)</label>
-                    <input type="number" step="0.01" min="1" name="amount" class="form-control" placeholder="e.g. 500" required>
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bi bi-tag me-1"></i>Category</label>
+                        <select name="category" class="form-select" required>
+                            <option value="" disabled selected>-- Select a category --</option>
+                            
+                            <optgroup label="🍔 Food & Drinks">
+                                <option value="Food">🍔 Food</option>
+                                <option value="Groceries">🛒 Groceries</option>
+                                <option value="Restaurants">🍽️ Restaurants</option>
+                                <option value="Coffee & Tea">☕ Coffee & Tea</option>
+                                <option value="Snacks">🍿 Snacks</option>
+                            </optgroup>
 
-                <div class="mb-3">
-                    <label class="form-label">Category</label>
-                    <select name="category" class="form-select" required>
-                        <option value="" disabled selected>Select category</option>
-                        <option value="Food">Food</option>
-                        <option value="Transport">Transport</option>
-                        <option value="Bills">Bills</option>
-                        <option value="Shopping">Shopping</option>
-                        <option value="Education">Education</option>
-                        <option value="Health">Health</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
+                            <optgroup label="🚗 Transport & Travel">
+                                <option value="Transport">🚌 Transport</option>
+                                <option value="Fuel">⛽ Fuel / Petrol</option>
+                                <option value="Ride Sharing">🚕 Ride Sharing (Uber/Careem)</option>
+                                <option value="Travel">✈️ Travel</option>
+                                <option value="Parking">🅿️ Parking</option>
+                            </optgroup>
 
-                <div class="mb-3">
-                    <label class="form-label">Description (optional)</label>
-                    <input type="text" name="description" class="form-control" placeholder="e.g. Lunch at university">
-                </div>
+                            <optgroup label="🏠 Bills & Utilities">
+                                <option value="Bills">💡 Electricity / Gas</option>
+                                <option value="Internet">📶 Internet / WiFi</option>
+                                <option value="Mobile Recharge">📱 Mobile Recharge</option>
+                                <option value="Rent">🏠 Rent</option>
+                                <option value="Water">💧 Water</option>
+                            </optgroup>
 
-                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-check-lg"></i> Add Expense</button>
-            </form>
+                            <optgroup label="📚 Education">
+                                <option value="Education">📚 Education / Tuition</option>
+                                <option value="Books">📖 Books & Stationery</option>
+                                <option value="Courses">🎓 Online Courses</option>
+                            </optgroup>
+
+                            <optgroup label="🏥 Health & Fitness">
+                                <option value="Health">🏥 Medical / Doctor</option>
+                                <option value="Medicine">💊 Medicine</option>
+                                <option value="Gym">💪 Gym / Fitness</option>
+                            </optgroup>
+
+                            <optgroup label="🛍️ Shopping & Lifestyle">
+                                <option value="Shopping">🛍️ Shopping</option>
+                                <option value="Clothing">👕 Clothing</option>
+                                <option value="Personal Care">💈 Personal Care</option>
+                                <option value="Electronics">📱 Electronics & Gadgets</option>
+                            </optgroup>
+
+                            <optgroup label="🎮 Entertainment">
+                                <option value="Entertainment">🎬 Entertainment</option>
+                                <option value="Subscriptions">📺 Subscriptions (Netflix etc.)</option>
+                                <option value="Gaming">🎮 Gaming</option>
+                            </optgroup>
+
+                            <optgroup label="💝 Other">
+                                <option value="Charity">🕌 Charity / Donation</option>
+                                <option value="Gifts">🎁 Gifts</option>
+                                <option value="Insurance">🛡️ Insurance</option>
+                                <option value="Maintenance">🔧 Repairs & Maintenance</option>
+                                <option value="Other">📋 Other</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label"><i class="bi bi-chat-left-text me-1"></i>Description (optional)</label>
+                        <div class="input-icon">
+                            <i class="bi bi-pencil"></i>
+                            <input type="text" name="description" class="form-control" placeholder="e.g. Lunch at university canteen">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-submit w-100">
+                        <i class="bi bi-plus-circle me-2"></i>Add Expense
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
