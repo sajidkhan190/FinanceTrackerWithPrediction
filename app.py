@@ -15,6 +15,10 @@ init_db()
 def shutdown_session(exception=None):
     close_connection(exception)
     
+@app.route('/')
+def index():
+    return redirect(url_for('auth.login'))
+
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
