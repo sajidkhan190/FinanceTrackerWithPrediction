@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for, render_template
+from flask import Flask, session, redirect, url_for, render_template, jsonify
 from models.database import close_connection, init_db, get_db 
 from routes.auth import auth 
 from routes.transactions import transactions
@@ -26,31 +26,56 @@ def dashboard():
     
     db = get_db()
 
-
-    # Total Income
-    income = db.execute("""
-        SELECT SUM(amount) FROM transactions
-        WHERE user_id = ? AND type = 'income'
-    """, (session['user_id'],)).fetchone()[0]
-
     # Total Expense
     expense = db.execute("""
         SELECT SUM(amount) FROM transactions
         WHERE user_id = ? AND type = 'expense'
     """, (session['user_id'],)).fetchone()[0]
 
-    income = income if income else 0
     expense = expense if expense else 0
 
-    balance = income - expense
+    # Category-wise expense distribution (for pie chart)
+    category_data = db.execute("""
+        SELECT category, SUM(amount) as total
+        FROM transactions
+        WHERE user_id = ? AND type = 'expense'
+        GROUP BY category
+        ORDER BY total DESC
+    """, (session['user_id'],)).fetchall()
+
+    categories = [row['category'] for row in category_data]
+    category_amounts = [row['total'] for row in category_data]
+
+    # Monthly expense summary (for bar chart)
+    monthly_data = db.execute("""
+        SELECT strftime('%Y-%m', date) as month, SUM(amount) as total
+        FROM transactions
+        WHERE user_id = ? AND type = 'expense'
+        GROUP BY month
+        ORDER BY month
+    """, (session['user_id'],)).fetchall()
+
+    months = [row['month'] for row in monthly_data]
+    monthly_amounts = [row['total'] for row in monthly_data]
+
+    # Recent 5 expenses
+    recent_expenses = db.execute("""
+        SELECT category, amount, date, description
+        FROM transactions
+        WHERE user_id = ? AND type = 'expense'
+        ORDER BY date DESC
+        LIMIT 5
+    """, (session['user_id'],)).fetchall()
 
     return render_template(
         "dashboard.html",
         name=session['user_name'],
-        income = income,
-        expense = expense,
-        balance = balance
-        
+        expense=expense,
+        categories=categories,
+        category_amounts=category_amounts,
+        months=months,
+        monthly_amounts=monthly_amounts,
+        recent_expenses=recent_expenses
     )
 
 if __name__ == '__main__':
