@@ -32,15 +32,9 @@
     </div>
 </div>
 
-<!-- Quick Actions -->
-<div class="mb-4">
-    <a href="/add" class="btn btn-dark"><i class="bi bi-plus-circle"></i> Add Expense</a>
-    <a href="/expenses" class="btn btn-outline-dark"><i class="bi bi-list-ul"></i> View All Expenses</a>
-</div>
-
 <!-- Charts Section -->
 {% if categories|length > 0 %}
-<div class="row mb-4">
+<div class="row mb-4" id="charts">
     <!-- Pie Chart: Category-wise Distribution -->
     <div class="col-md-6 mb-3">
         <div class="card h-100">
