@@ -1,0 +1,12 @@
+# requirements
+Flask>=2.0
+Werkzeug>=2.0
+
+# machine‑learning / plotting
+scikit-learn>=1.0
+matplotlib>=3.0
+plotly>=5.0
+
+# numerical / tabular data handling
+numpy>=1.20
+pandas>=2.0
