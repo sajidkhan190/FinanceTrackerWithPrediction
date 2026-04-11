@@ -32,6 +32,6 @@ FinanceTrackerWithPrediction/<br>
 ✅ SQLite Database Connected <br>
 ✅ User Authentication Module <br>
 ✅ Expense Management <br>
-⬜ Icome Management <br>
+✅ Icome Management <br>
+⬜ Expense Prediction Module (In Progress) <br>
 ⬜ Reports & Visualization <br>
-⬜ Expense Prediction Module
