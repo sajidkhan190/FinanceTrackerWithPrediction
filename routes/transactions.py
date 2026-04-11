@@ -28,7 +28,7 @@ def add_transaction():
         
         db.commit()
         flash('Expense added successfully!', 'success')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('dashboard_bp.dashboard'))
 
     return render_template('add_transaction.html')
 
@@ -73,7 +73,7 @@ def add_income():
         
         db.commit()
         flash('Income added successfully!', 'success')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('dashboard_bp.dashboard'))
     
     # Hum aapki khali add_entry.html file ko Add Income ke liye use karenge
     return render_template('add_entry.html') 

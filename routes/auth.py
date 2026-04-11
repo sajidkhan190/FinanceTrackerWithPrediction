@@ -49,7 +49,7 @@ def login():
             session['user_id'] = user['id']
             session['user_name'] = user['name']                
             flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('dashboard_bp.dashboard'))
         else:
             flash('Invalid email or password.', 'error')
 
