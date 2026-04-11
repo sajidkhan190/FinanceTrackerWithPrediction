@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, url_for
 from models.database import get_db
+from utils.ml_model import predict_next_month_expense
 
 # Blueprint banaya
 dashboard_bp = Blueprint('dashboard_bp', __name__)
@@ -11,6 +12,9 @@ def dashboard():
     
     db = get_db()
     user_id = session['user_id']
+
+    # ML Prediction Call
+    predicted_expense = predict_next_month_expense(db, user_id)
 
     # 1. Total Expense
     expense = db.execute("""
@@ -28,6 +32,8 @@ def dashboard():
 
     # 3. Current Balance
     balance = income - expense
+
+    
 
     # 4. Category-wise expense (Pie Chart ke liye)
     category_data = db.execute("""
@@ -70,5 +76,6 @@ def dashboard():
         category_amounts=category_amounts,
         months=months,
         monthly_amounts=monthly_amounts,
-        recent_transactions=recent_transactions
+        recent_transactions=recent_transactions,
+        predicted_expense=predicted_expense
     )

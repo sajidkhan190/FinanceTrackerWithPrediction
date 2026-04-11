@@ -5,30 +5,49 @@
 <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Welcome, {{ name }}!</h2>
 
 <div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card text-white {% if balance >= 0 %}bg-success{% else %}bg-danger{% endif %} h-100">
+    <div class="col-md-3 mb-3">
+        <div class="card text-white {% if balance >= 0 %}bg-success{% else %}bg-danger{% endif %} h-100 shadow-sm">
             <div class="card-body text-center d-flex flex-column justify-content-center">
-                <h5><i class="bi bi-wallet2"></i> Current Balance</h5>
-                <h2>Rs. {{ "%.2f"|format(balance) }}</h2>
+                <h6><i class="bi bi-wallet2"></i> Current Balance</h6>
+                <h4>Rs. {{ "%.2f"|format(balance) }}</h4>
             </div>
         </div>
     </div>
-    <div class="col-md-4 mb-3">
-        <div class="card bg-light h-100 border-success border-2" style="border-radius: 14px;">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-light h-100 border-success border-2 shadow-sm" style="border-radius: 14px;">
             <div class="card-body text-center d-flex flex-column justify-content-center">
-                <h5 class="text-success"><i class="bi bi-arrow-up-circle"></i> Total Income</h5>
-                <h2 class="text-success">Rs. {{ "%.2f"|format(income) }}</h2>
+                <h6 class="text-success"><i class="bi bi-arrow-up-circle"></i> Total Income</h6>
+                <h4 class="text-success">Rs. {{ "%.2f"|format(income) }}</h4>
             </div>
         </div>
     </div>
-    <div class="col-md-4 mb-3">
-        <div class="card bg-light h-100 border-danger border-2" style="border-radius: 14px;">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-light h-100 border-danger border-2 shadow-sm" style="border-radius: 14px;">
             <div class="card-body text-center d-flex flex-column justify-content-center">
-                <h5 class="text-danger"><i class="bi bi-arrow-down-circle"></i> Total Expenses</h5>
-                <h2 class="text-danger">Rs. {{ "%.2f"|format(expense) }}</h2>
+                <h6 class="text-danger"><i class="bi bi-arrow-down-circle"></i> Total Expenses</h6>
+                <h4 class="text-danger">Rs. {{ "%.2f"|format(expense) }}</h4>
             </div>
         </div>
     </div>
+    <div class="col-md-3 mb-3">
+    <div class="card h-100 shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 14px;">
+        <div class="card-body text-center d-flex flex-column justify-content-center">
+            <h6><i class="bi bi-robot"></i> Predicted Next Month Expense</h6>
+            {% if predicted_expense != None %}
+                <h4>Rs. {{ "%.2f"|format(predicted_expense) }}</h4>
+                
+                {% if expense > predicted_expense * 0.8 %}
+                    <small class="badge bg-danger mt-2">Warning: Nearing predicted limit!</small>
+                {% else %}
+                    <small class="badge bg-success mt-2">On Track</small>
+                {% endif %}
+                
+            {% else %}
+                <small class="text-light">Need at least 2 months of data</small>
+            {% endif %}
+        </div>
+    </div>
+</div>
 </div>
 
 {% if categories|length > 0 %}
