@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Reports | Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-earmark-bar-graph"></i> Financial Reports</h2>
+    <a href="{{ url_for('reports.export_data') }}" class="btn btn-success">
+        <i class="bi bi-filetype-csv me-2"></i> Export to CSV
+    </a>
+</div>
+
+<div class="card mb-4 shadow-sm border-0" style="border-radius: 14px;">
+    <div class="card-body">
+        <h5 class="card-title mb-3"><i class="bi bi-funnel"></i> Filter Data</h5>
+        <form method="POST" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Start Date</label>
+                <input type="date" name="start_date" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">End Date</label>
+                <input type="date" name="end_date" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Category</label>
+                <select name="category" class="form-select">
+                    <option value="all">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Type</label>
+                <select name="type" class="form-select">
+                    <option value="all">All</option>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0" style="border-radius: 14px;">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount (Rs.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for txn in transactions %}
+                    <tr>
+                        <td>{{ txn['date'] }}</td>
+                        <td>
+                            {% if txn['type'] == 'income' %}
+                                <span class="badge bg-success">Income</span>
+                            {% else %}
+                                <span class="badge bg-danger">Expense</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-secondary">{{ txn['category'] }}</span></td>
+                        <td>{{ txn['description'] if txn['description'] else '-' }}</td>
+                        <td class="text-end fw-bold {% if txn['type'] == 'income' %}text-success{% else %}text-danger{% endif %}">
+                            {{ "%.2f"|format(txn['amount']) }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No data found for the selected filters.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
