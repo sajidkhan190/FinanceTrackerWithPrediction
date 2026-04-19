@@ -33,5 +33,6 @@ FinanceTrackerWithPrediction/<br>
 ✅ User Authentication Module <br>
 ✅ Expense Management <br>
 ✅ Icome Management <br>
-⬜ Expense Prediction Module (In Progress) <br>
-⬜ Reports & Visualization <br>
+✅ Expense Prediction Module  <br>
+✅ Reports & Visualization <br>
+⬜ Back & Restore of User Data (in progress) <br>
