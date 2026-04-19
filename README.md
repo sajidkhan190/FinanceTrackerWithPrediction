@@ -35,4 +35,4 @@ FinanceTrackerWithPrediction/<br>
 ✅ Icome Management <br>
 ✅ Expense Prediction Module  <br>
 ✅ Reports & Visualization <br>
-⬜ Back & Restore of User Data (in progress) <br>
+✅ Back & Restore of User Data <br>
