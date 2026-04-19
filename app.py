@@ -4,12 +4,15 @@ from routes.auth import auth
 from routes.transactions import transactions
 from routes.dashboard import dashboard_bp
 from routes.reports import reports
+from routes.backup import backup
+
 
 app = Flask(__name__)
 app.register_blueprint(auth)
 app.register_blueprint(transactions)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(reports)
+app.register_blueprint(backup)
 app.secret_key = 's4l143@@'
 
 init_db()
