@@ -18,6 +18,7 @@
                         <th>Category</th>
                         <th>Description</th>
                         <th class="text-end">Amount (Rs.)</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -28,6 +29,40 @@
                         <td><span class="badge bg-success">{{ income['category'] }}</span></td>
                         <td>{{ income['description'] if income['description'] else '-' }}</td>
                         <td class="text-end fw-bold text-success">{{ "%.2f"|format(income['amount']) }}</td>
+                        <td class="text-center">
+                            <div class="d-inline-flex gap-2">
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editIncomeModal"
+                                    data-id="{{ income['id'] }}"
+                                    data-date="{{ income['date'] }}"
+                                    data-category="{{ income['category']|e }}"
+                                    data-description="{{ (income['description'] or '')|e }}"
+                                    data-amount="{{ income['amount'] }}"
+                                >
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </button>
+
+                                <form
+                                    id="deleteIncomeForm-{{ income['id'] }}"
+                                    method="POST"
+                                    action="{{ url_for('transactions.delete_income', transaction_id=income['id']) }}"
+                                >
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-outline-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteIncomeModal"
+                                        data-form-id="deleteIncomeForm-{{ income['id'] }}"
+                                        data-name="{{ income['category']|e }}"
+                                    >
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -41,6 +76,70 @@
     <h5>Total Income: <span class="text-success">Rs. {{ "%.2f"|format(total|sum) }}</span></h5>
 </div>
 
+<div class="modal fade" id="editIncomeModal" tabindex="-1" aria-labelledby="editIncomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editIncomeModalLabel"><i class="bi bi-pencil-square"></i> Edit Income</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editIncomeForm" method="POST">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" name="date" id="editIncomeDate" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Amount (Rs.)</label>
+                            <input type="number" step="0.01" min="0.01" class="form-control" name="amount" id="editIncomeAmount" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category" id="editIncomeCategory" required>
+                                <option value="" disabled>-- Select Income Source --</option>
+                                <option value="Salary">💼 Salary</option>
+                                <option value="Business">🏢 Business / Shop</option>
+                                <option value="Freelancing">💻 Freelancing</option>
+                                <option value="Investments">📈 Investments / Profit</option>
+                                <option value="Rental Income">🏠 Rental Income</option>
+                                <option value="Pocket Money">💰 Pocket Money / Allowance</option>
+                                <option value="Other">📋 Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Description (optional)</label>
+                            <input type="text" class="form-control" name="description" id="editIncomeDescription">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveIncomeChangesBtn" disabled>Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteIncomeModal" tabindex="-1" aria-labelledby="deleteIncomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteIncomeModalLabel"><i class="bi bi-exclamation-triangle text-danger"></i> Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Do you want to delete this income: <strong id="deleteIncomeName">-</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">No, Do not delete it</button>
+                <button type="button" class="btn btn-danger" id="confirmIncomeDeleteBtn">Yes, delete it</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% else %}
 <div class="text-center mt-5">
     <i class="bi bi-cash-coin" style="font-size: 4rem; color: #ccc;"></i>
@@ -48,4 +147,109 @@
     <p class="text-muted">Click "Add Income" to add your first income entry.</p>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const editIncomeModal = document.getElementById('editIncomeModal');
+    const editIncomeForm = document.getElementById('editIncomeForm');
+    const saveIncomeChangesBtn = document.getElementById('saveIncomeChangesBtn');
+    const editIncomeDate = document.getElementById('editIncomeDate');
+    const editIncomeAmount = document.getElementById('editIncomeAmount');
+    const editIncomeCategory = document.getElementById('editIncomeCategory');
+    const editIncomeDescription = document.getElementById('editIncomeDescription');
+
+    let originalIncomeValues = null;
+
+    function normalizeIncomeAmount(value) {
+        const parsed = parseFloat(value || '0');
+        return Number.isNaN(parsed) ? '' : parsed.toFixed(2);
+    }
+
+    function toggleIncomeSaveButton() {
+        if (!saveIncomeChangesBtn || !originalIncomeValues) return;
+
+        const currentValues = {
+            date: (editIncomeDate?.value || '').trim(),
+            amount: normalizeIncomeAmount(editIncomeAmount?.value || ''),
+            category: (editIncomeCategory?.value || '').trim(),
+            description: (editIncomeDescription?.value || '').trim()
+        };
+
+        const changed =
+            currentValues.date !== originalIncomeValues.date ||
+            currentValues.amount !== originalIncomeValues.amount ||
+            currentValues.category !== originalIncomeValues.category ||
+            currentValues.description !== originalIncomeValues.description;
+
+        saveIncomeChangesBtn.disabled = !changed;
+    }
+
+    if (editIncomeModal) {
+        editIncomeModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const transactionId = button.getAttribute('data-id');
+
+            const date = (button.getAttribute('data-date') || '').trim();
+            const amountRaw = button.getAttribute('data-amount') || '';
+            const category = (button.getAttribute('data-category') || '').trim();
+            const description = (button.getAttribute('data-description') || '').trim();
+
+            editIncomeForm.action = `/incomes/${transactionId}/edit`;
+            editIncomeDate.value = date;
+            editIncomeAmount.value = amountRaw;
+            const hasCategoryOption = Array.from(editIncomeCategory.options).some((opt) => opt.value === category);
+            if (!hasCategoryOption && category) {
+                const customOption = document.createElement('option');
+                customOption.value = category;
+                customOption.textContent = category;
+                editIncomeCategory.appendChild(customOption);
+            }
+            editIncomeCategory.value = category;
+            editIncomeDescription.value = description;
+
+            originalIncomeValues = {
+                date,
+                amount: normalizeIncomeAmount(amountRaw),
+                category,
+                description
+            };
+
+            toggleIncomeSaveButton();
+        });
+    }
+
+    [editIncomeDate, editIncomeAmount, editIncomeCategory, editIncomeDescription].forEach((field) => {
+        if (field) {
+            field.addEventListener('input', toggleIncomeSaveButton);
+            field.addEventListener('change', toggleIncomeSaveButton);
+        }
+    });
+
+    const deleteIncomeModal = document.getElementById('deleteIncomeModal');
+    const deleteIncomeName = document.getElementById('deleteIncomeName');
+    const confirmIncomeDeleteBtn = document.getElementById('confirmIncomeDeleteBtn');
+    let incomeDeleteFormId = null;
+
+    if (deleteIncomeModal) {
+        deleteIncomeModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            incomeDeleteFormId = button.getAttribute('data-form-id');
+            const incomeName = button.getAttribute('data-name') || 'this income';
+            if (deleteIncomeName) {
+                deleteIncomeName.textContent = incomeName;
+            }
+        });
+    }
+
+    if (confirmIncomeDeleteBtn) {
+        confirmIncomeDeleteBtn.addEventListener('click', function () {
+            if (!incomeDeleteFormId) return;
+            const form = document.getElementById(incomeDeleteFormId);
+            if (form) {
+                form.submit();
+            }
+        });
+    }
+</script>
 {% endblock %}

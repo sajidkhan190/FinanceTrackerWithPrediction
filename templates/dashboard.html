@@ -195,7 +195,7 @@
                 datasets: [{
                     label: 'Expense (Rs.)',
                     data: categoryAmounts,
-                    backgroundColor: expenseColor,
+                    backgroundColor: colors.slice(0, categories.length),
                     borderRadius: 6
                 }]
             },
@@ -253,7 +253,7 @@
                 datasets: [{
                     label: 'Income (Rs.)',
                     data: incCategoryAmounts,
-                    backgroundColor: incomeColor,
+                    backgroundColor: colors.slice(0, incCategories.length),
                     borderRadius: 6
                 }]
             },
