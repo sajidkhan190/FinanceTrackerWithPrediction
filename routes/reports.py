@@ -15,19 +15,33 @@ def view_reports():
     query = "SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC"
     params = [user_id]
 
+    selected_start_date = ''
+    selected_end_date = ''
+    selected_category = 'all'
+    selected_type = 'all'
+
     if request.method == 'POST':
-        start_date = request.form.get('start_date')
-        end_date = request.form.get('end_date')
+        start_date = (request.form.get('start_date') or '').strip()
+        end_date = (request.form.get('end_date') or '').strip()
         category = request.form.get('category')
         t_type = request.form.get('type')
+
+        selected_start_date = start_date or ''
+        selected_end_date = end_date or ''
+        selected_category = category or 'all'
+        selected_type = t_type or 'all'
 
         # Filters ke hisaab se query build karna
         query = "SELECT * FROM transactions WHERE user_id = ?"
         params = [user_id]
         
-        if start_date and end_date:
-            query += " AND date BETWEEN ? AND ?"
-            params.extend([start_date, end_date])
+        if start_date:
+            query += " AND date >= ?"
+            params.append(start_date)
+
+        if end_date:
+            query += " AND date <= ?"
+            params.append(end_date)
         
         if category and category != 'all':
             query += " AND category = ?"
@@ -45,7 +59,15 @@ def view_reports():
     categories_data = db.execute("SELECT DISTINCT category FROM transactions WHERE user_id = ?", (user_id,)).fetchall()
     categories = [row['category'] for row in categories_data]
 
-    return render_template('reports.html', transactions=transactions, categories=categories)
+    return render_template(
+        'reports.html',
+        transactions=transactions,
+        categories=categories,
+        selected_start_date=selected_start_date,
+        selected_end_date=selected_end_date,
+        selected_category=selected_category,
+        selected_type=selected_type,
+    )
 
 @reports.route('/export')
 def export_data():

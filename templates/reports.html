@@ -12,36 +12,34 @@
 <div class="card mb-4 shadow-sm border-0" style="border-radius: 14px;">
     <div class="card-body">
         <h5 class="card-title mb-3"><i class="bi bi-funnel"></i> Filter Data</h5>
-        <form method="POST" class="row g-3">
+        <form method="POST" class="row g-3" id="reportsFilterForm">
             <div class="col-md-3">
                 <label class="form-label">Start Date</label>
-                <input type="date" name="start_date" class="form-control">
+                <input type="date" name="start_date" class="form-control filter-input" value="{{ selected_start_date }}">
             </div>
             <div class="col-md-3">
                 <label class="form-label">End Date</label>
-                <input type="date" name="end_date" class="form-control">
+                <input type="date" name="end_date" class="form-control filter-input" value="{{ selected_end_date }}">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Category</label>
-                <select name="category" class="form-select">
-                    <option value="all">All Categories</option>
+                <select name="category" class="form-select filter-input">
+                    <option value="all" {% if selected_category == 'all' %}selected{% endif %}>All Categories</option>
                     {% for cat in categories %}
-                        <option value="{{ cat }}">{{ cat }}</option>
+                        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <label class="form-label">Type</label>
-                <select name="type" class="form-select">
-                    <option value="all">All</option>
-                    <option value="income">Income</option>
-                    <option value="expense">Expense</option>
+                <select name="type" class="form-select filter-input">
+                    <option value="all" {% if selected_type == 'all' %}selected{% endif %}>All</option>
+                    <option value="income" {% if selected_type == 'income' %}selected{% endif %}>Income</option>
+                    <option value="expense" {% if selected_type == 'expense' %}selected{% endif %}>Expense</option>
                 </select>
             </div>
-            <div class="col-md-1 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i></button>
-            </div>
         </form>
+        <small class="text-muted d-block mt-2">Filters apply automatically when you change a value.</small>
     </div>
 </div>
 
@@ -85,4 +83,19 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const reportsFilterForm = document.getElementById('reportsFilterForm');
+    const filterInputs = document.querySelectorAll('.filter-input');
+
+    if (reportsFilterForm && filterInputs.length) {
+        filterInputs.forEach((element) => {
+            element.addEventListener('change', () => {
+                reportsFilterForm.submit();
+            });
+        });
+    }
+</script>
 {% endblock %}
