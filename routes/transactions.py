@@ -48,6 +48,66 @@ def view_expenses():
 
     return render_template('expenses.html', expenses=expenses)
 
+
+@transactions.route('/expenses/<int:transaction_id>/delete', methods=['POST'])
+def delete_expense(transaction_id):
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    db = get_db()
+    result = db.execute("""
+        DELETE FROM transactions
+        WHERE id = ? AND user_id = ? AND type = 'expense'
+    """, (transaction_id, session['user_id']))
+    db.commit()
+
+    if result.rowcount:
+        flash('Expense deleted successfully!', 'success')
+    else:
+        flash('Expense not found or permission denied.', 'error')
+
+    return redirect(url_for('transactions.view_expenses'))
+
+
+@transactions.route('/expenses/<int:transaction_id>/edit', methods=['POST'])
+def edit_expense(transaction_id):
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    category = request.form.get('category', '').strip()
+    description = request.form.get('description', '').strip()
+    date = request.form.get('date', '').strip()
+    amount_raw = request.form.get('amount', '').strip()
+
+    try:
+        amount = float(amount_raw)
+    except ValueError:
+        flash('Invalid amount value.', 'error')
+        return redirect(url_for('transactions.view_expenses'))
+
+    if not category or not date:
+        flash('Category and date are required.', 'error')
+        return redirect(url_for('transactions.view_expenses'))
+
+    if amount <= 0:
+        flash('Amount must be greater than zero.', 'error')
+        return redirect(url_for('transactions.view_expenses'))
+
+    db = get_db()
+    result = db.execute("""
+        UPDATE transactions
+        SET category = ?, amount = ?, description = ?, date = ?
+        WHERE id = ? AND user_id = ? AND type = 'expense'
+    """, (category, amount, description, date, transaction_id, session['user_id']))
+    db.commit()
+
+    if result.rowcount:
+        flash('Expense updated successfully!', 'success')
+    else:
+        flash('Expense not found or permission denied.', 'error')
+
+    return redirect(url_for('transactions.view_expenses'))
+
 @transactions.route('/add_income', methods=['GET', 'POST'])
 def add_income():
     if 'user_id' not in session:
@@ -92,3 +152,63 @@ def view_incomes():
     """, (session['user_id'],)).fetchall()
 
     return render_template('incomes.html', incomes=incomes)
+
+
+@transactions.route('/incomes/<int:transaction_id>/delete', methods=['POST'])
+def delete_income(transaction_id):
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    db = get_db()
+    result = db.execute("""
+        DELETE FROM transactions
+        WHERE id = ? AND user_id = ? AND type = 'income'
+    """, (transaction_id, session['user_id']))
+    db.commit()
+
+    if result.rowcount:
+        flash('Income deleted successfully!', 'success')
+    else:
+        flash('Income not found or permission denied.', 'error')
+
+    return redirect(url_for('transactions.view_incomes'))
+
+
+@transactions.route('/incomes/<int:transaction_id>/edit', methods=['POST'])
+def edit_income(transaction_id):
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    category = request.form.get('category', '').strip()
+    description = request.form.get('description', '').strip()
+    date = request.form.get('date', '').strip()
+    amount_raw = request.form.get('amount', '').strip()
+
+    try:
+        amount = float(amount_raw)
+    except ValueError:
+        flash('Invalid amount value.', 'error')
+        return redirect(url_for('transactions.view_incomes'))
+
+    if not category or not date:
+        flash('Category and date are required.', 'error')
+        return redirect(url_for('transactions.view_incomes'))
+
+    if amount <= 0:
+        flash('Amount must be greater than zero.', 'error')
+        return redirect(url_for('transactions.view_incomes'))
+
+    db = get_db()
+    result = db.execute("""
+        UPDATE transactions
+        SET category = ?, amount = ?, description = ?, date = ?
+        WHERE id = ? AND user_id = ? AND type = 'income'
+    """, (category, amount, description, date, transaction_id, session['user_id']))
+    db.commit()
+
+    if result.rowcount:
+        flash('Income updated successfully!', 'success')
+    else:
+        flash('Income not found or permission denied.', 'error')
+
+    return redirect(url_for('transactions.view_incomes'))
